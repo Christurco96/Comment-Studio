@@ -31,7 +31,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fn)
 .count-row::-webkit-scrollbar{display:none;}
 .clabel{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
 .cbtns{display:flex;gap:4px;}
-.cbt{min-width:36px;height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-size:13px;font-weight:700;font-family:var(--fn);cursor:pointer;-webkit-appearance:none;}
+.cbt{min-width:30px;height:32px;padding:0 7px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--t2);font-size:12px;font-weight:700;font-family:var(--fn);cursor:pointer;-webkit-appearance:none;}
 .cbt.on{background:var(--red);color:#fff;border-color:var(--red);}
 
 .tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;}
@@ -160,9 +160,6 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fn)
   <div class="count-row">
     <span class="clabel">N°</span>
     <div class="cbtns" id="cbtns"></div>
-    <select id="num-select" onchange="selectN(+this.value)"
-      style="height:32px;border-radius:8px;border:1px solid var(--b2);background:var(--s2);color:var(--t1);font-size:13px;font-weight:700;font-family:var(--fn);padding:0 8px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;min-width:64px;text-align:center;">
-    </select>
   </div>
 </div>
 
@@ -256,38 +253,29 @@ function ini(n){return n.replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'TK
 
 function go(t){['edit','prev'].forEach(id=>{document.getElementById('tab-'+id).classList.toggle('on',id===t);document.getElementById('panel-'+id).classList.toggle('on',id===t);});}
 
-function buildCbtns(){
-  // Quick buttons
-  const w=document.getElementById('cbtns');
-  if(w){
-    w.innerHTML='';
-    [1,2,3,16].forEach(n=>{
-      const b=document.createElement('button');
-      b.className='cbt'+(n===N?' on':'');
-      b.textContent=n;
-      b.onclick=()=>selectN(n);
-      w.appendChild(b);
-    });
-  }
-  // Populate select
-  const sel=document.getElementById('num-select');
-  if(sel){
-    sel.innerHTML='';
-    for(let i=1;i<=100;i++){
-      const o=document.createElement('option');
-      o.value=i;o.textContent=i;
-      if(i===N)o.selected=true;
-      sel.appendChild(o);
-    }
-  }
+function setN(n){
+  N=Math.max(1,Math.min(100,n));
+  document.getElementById('rsl').max=N;
+  document.getElementById('dsl').max=N;
+  if(ringCount>N){ringCount=N;document.getElementById('rsl').value=N;document.getElementById('rn').textContent=N;}
+  if(defaultCount>N){defaultCount=N;document.getElementById('dsl').value=N;document.getElementById('dn').textContent=N;}
 }
 
-function selectN(n){
-  setN(n);
-  document.querySelectorAll('.cbt').forEach(b=>b.classList.toggle('on',+b.textContent===n));
-  const sel=document.getElementById('num-select');
-  if(sel)sel.value=n;
-  buildSlots();
+function buildCbtns(){
+  const w=document.getElementById('cbtns');
+  if(!w)return;
+  w.innerHTML='';
+  [1,2,4,6,8,12,16,20].forEach(n=>{
+    const b=document.createElement('button');
+    b.className='cbt'+(n===N?' on':'');
+    b.textContent=n;
+    b.onclick=()=>{
+      setN(n);
+      document.querySelectorAll('.cbt').forEach(x=>x.classList.toggle('on',+x.textContent===n));
+      buildSlots();
+    };
+    w.appendChild(b);
+  });
 }
 
 function setDC(v){
